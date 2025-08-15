@@ -95,123 +95,233 @@
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800">
-    <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v18.0" nonce="aAbBcCdD"></script>
 
-    <header class="bg-white/80 backdrop-blur-md shadow-md border-b border-slate-200 sticky top-0 z-40">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-2xl font-bold text-blue-600">
-                Pastoral de Comunicación
-                <span class="block text-sm font-normal text-slate-500">Diócesis de Santo Tomé</span>
+    <!-- Pantalla de Login -->
+    <div id="login-container" class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    Iniciar sesión
+                </h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Pastoral de Comunicación
+                </p>
             </div>
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="#inicio" class="nav-link text-slate-600 hover:text-blue-500 transition duration-300 active">Inicio</a>
-                <a href="#recursos" class="nav-link text-slate-600 hover:text-blue-500 transition duration-300">Recursos</a>
-                <a href="https://www.diocesisdesantotome.com/" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-blue-500 transition duration-300">Página Web</a>
-                <a href="https://www.curas.com.ar/menu_alm_cal.htm" target="_blank" rel="noopener noreferrer" class="btn-animated btn-gradient-blue inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-lg shadow-md">Evangelio del día</a>
-                <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" class="btn-animated btn-gradient-purple inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-lg shadow-md">
-                    Canva
-                </a>
-            </div>
-            <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
-        </nav>
-        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
-            <a href="#inicio" class="nav-link block py-2 text-slate-600 hover:text-blue-500 active">Inicio</a>
-            <a href="#recursos" class="nav-link block py-2 text-slate-600 hover:text-blue-500">Recursos</a>
-            <a href="https://www.diocesisdesantotome.com/" target="_blank" rel="noopener noreferrer" class="block py-2 text-slate-600 hover:text-blue-500">Página Web</a>
-            <a href="https://www.curas.com.ar/menu_alm_cal.htm" target="_blank" rel="noopener noreferrer" class="block text-center w-full px-4 py-2 text-white font-semibold rounded-lg btn-animated btn-gradient-blue">Evangelio del día</a>
-            <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" class="block text-center w-full px-4 py-2 text-white font-semibold rounded-lg btn-animated btn-gradient-purple">Canva</a>
-        </div>
-    </header>
-
-    <main class="container mx-auto p-4 md:p-6 mt-6">
-        <div id="page-inicio" class="page">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <button id="prev-month" class="p-2 rounded-full hover:bg-slate-200 transition duration-300 btn-animated">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        </button>
-                        <h2 id="month-year" class="text-xl font-bold text-center"></h2>
-                        <button id="next-month" class="p-2 rounded-full hover:bg-slate-200 transition duration-300 btn-animated">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
+            <form id="login-form" class="mt-8 space-y-6" action="#" method="POST">
+                <input type="hidden" name="remember" value="true">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="email-address" class="sr-only">Correo electrónico</label>
+                        <input id="email-address" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Correo electrónico">
                     </div>
-                    <div id="calendar" class="grid grid-cols-7">
-                        <div class="text-center font-semibold text-slate-500 py-2">Dom</div>
-                        <div class="text-center font-semibold text-slate-500 py-2">Lun</div>
-                        <div class="text-center font-semibold text-slate-500 py-2">Mar</div>
-                        <div class="text-center font-semibold text-slate-500 py-2">Mié</div>
-                        <div class="text-center font-semibold text-slate-500 py-2">Jue</div>
-                        <div class="text-center font-semibold text-slate-500 py-2">Vie</div>
-                        <div class="text-center font-semibold text-slate-500 py-2">Sáb</div>
+                    <div>
+                        <label for="password" class="sr-only">Contraseña</label>
+                        <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Contraseña">
                     </div>
                 </div>
-                <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg flex flex-col border border-slate-200">
-                     <h3 class="text-2xl font-bold mb-4 text-slate-700">Seguinos en Facebook</h3>
-                     <div class="flex-grow">
-                         <div class="fb-page" 
-                             data-href="https://www.facebook.com/diocesisdesantotomectes" 
-                             data-tabs="timeline" 
-                             data-width="" 
-                             data-height="600" 
-                             data-small-header="false" 
-                             data-adapt-container-width="true" 
-                             data-hide-cover="false" 
-                             data-show-facepile="true">
-                             <blockquote cite="https://www.facebook.com/diocesisdesantotomectes" class="fb-xfbml-parse-ignore">
-                                 <a href="https://www.facebook.com/diocesisdesantotomectes">Diócesis de Santo Tomé</a>
-                             </blockquote>
-                         </div>
-                     </div>
-                </div>
-            </div>
-        </div>
 
-        <div id="page-recursos" class="page hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
-                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Acta de la Pastoral</h2>
-                    <p class="text-slate-600 mb-6">Gestiona las actas de las reuniones de la pastoral.</p>
-                    <a href="https://docs.google.com/document/d/15s6Qehevb3M_skfp1ZC-ZCcMNXMWN1YUMvgXCzzAktk/edit?tab=t.0" target="_blank" rel="noopener noreferrer" class="inline-block px-6 py-3 text-white font-semibold rounded-lg btn-animated btn-gradient-blue">
-                        Acta de la Pastoral
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 btn-animated">
+                        Acceder
+                    </button>
+                </div>
+                <p id="login-error" class="mt-2 text-center text-sm text-red-600 hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contenido principal de la aplicación (oculto por defecto) -->
+    <div id="app-container" class="hidden">
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v18.0" nonce="aAbBcCdD"></script>
+
+        <header class="bg-white/80 backdrop-blur-md shadow-md border-b border-slate-200 sticky top-0 z-40">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="text-2xl font-bold text-blue-600">
+                    Pastoral de Comunicación
+                    <span class="block text-sm font-normal text-slate-500">Diócesis de Santo Tomé</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#inicio" class="nav-link text-slate-600 hover:text-blue-500 transition duration-300 active">Inicio</a>
+                    <a href="#recursos" class="nav-link text-slate-600 hover:text-blue-500 transition duration-300">Recursos</a>
+                    <a href="https://www.diocesisdesantotome.com/" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-blue-500 transition duration-300">Página Web</a>
+                    <a href="https://www.curas.com.ar/menu_alm_cal.htm" target="_blank" rel="noopener noreferrer" class="btn-animated btn-gradient-blue inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-lg shadow-md">Evangelio del día</a>
+                    <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" class="btn-animated btn-gradient-purple inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-lg shadow-md">
+                        Canva
                     </a>
+                    <button id="logout-button" class="text-slate-600 hover:text-blue-500 transition duration-300">Cerrar Sesión</button>
                 </div>
-                <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
-                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Estatuto de la Pastoral</h2>
-                    <p class="text-slate-600 mb-6">Consulta el documento oficial que rige el funcionamiento de la pastoral.</p>
-                    <a href="https://docs.google.com/document/d/1UvKDtRVyfuhkiARHa9lU7r0Rd_UpyMT0mv2-2QZ1mco/edit?tab=t.0" target="_blank" rel="noopener noreferrer" class="inline-block px-6 py-3 text-white font-semibold rounded-lg btn-animated btn-gradient-blue">Ver Estatuto</a>
-                </div>
+                <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </nav>
+            <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+                <a href="#inicio" class="nav-link block py-2 text-slate-600 hover:text-blue-500 active">Inicio</a>
+                <a href="#recursos" class="nav-link block py-2 text-slate-600 hover:text-blue-500">Recursos</a>
+                <a href="https://www.diocesisdesantotome.com/" target="_blank" rel="noopener noreferrer" class="block py-2 text-slate-600 hover:text-blue-500">Página Web</a>
+                <a href="https://www.curas.com.ar/menu_alm_cal.htm" target="_blank" rel="noopener noreferrer" class="block text-center w-full px-4 py-2 text-white font-semibold rounded-lg btn-animated btn-gradient-blue">Evangelio del día</a>
+                <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" class="block text-center w-full px-4 py-2 text-white font-semibold rounded-lg btn-animated btn-gradient-purple">Canva</a>
+                <button id="logout-button-mobile" class="block w-full text-left py-2 text-slate-600 hover:text-blue-500">Cerrar Sesión</button>
             </div>
-        </div>
-    </main>
+        </header>
 
-    <div id="event-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Editar Información del Día</h3>
-            <p class="mb-4">Fecha: <span id="selected-date" class="font-semibold"></span></p>
-            <div class="space-y-4">
-                <div>
-                    <label for="encargado-name" class="block text-sm font-medium text-slate-700 mb-1">Encargado del Flyer:</label>
-                    <input type="text" id="encargado-name" class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Nombre del encargado...">
-                </div>
-                <div>
-                    <label for="other-info" class="block text-sm font-medium text-slate-700 mb-1">Otra Información:</label>
-                    <textarea id="other-info" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Añadir notas o información adicional..."></textarea>
+        <main class="container mx-auto p-4 md:p-6 mt-6">
+            <div id="page-inicio" class="page">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <button id="prev-month" class="p-2 rounded-full hover:bg-slate-200 transition duration-300 btn-animated">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <h2 id="month-year" class="text-xl font-bold text-center"></h2>
+                            <button id="next-month" class="p-2 rounded-full hover:bg-slate-200 transition duration-300 btn-animated">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                        <div id="calendar" class="grid grid-cols-7">
+                            <div class="text-center font-semibold text-slate-500 py-2">Dom</div>
+                            <div class="text-center font-semibold text-slate-500 py-2">Lun</div>
+                            <div class="text-center font-semibold text-slate-500 py-2">Mar</div>
+                            <div class="text-center font-semibold text-slate-500 py-2">Mié</div>
+                            <div class="text-center font-semibold text-slate-500 py-2">Jue</div>
+                            <div class="text-center font-semibold text-slate-500 py-2">Vie</div>
+                            <div class="text-center font-semibold text-slate-500 py-2">Sáb</div>
+                        </div>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg flex flex-col border border-slate-200">
+                         <h3 class="text-2xl font-bold mb-4 text-slate-700">Seguinos en Facebook</h3>
+                         <div class="flex-grow">
+                             <div class="fb-page" 
+                                 data-href="https://www.facebook.com/diocesisdesantotomectes" 
+                                 data-tabs="timeline" 
+                                 data-width="" 
+                                 data-height="600" 
+                                 data-small-header="false" 
+                                 data-adapt-container-width="true" 
+                                 data-hide-cover="false" 
+                                 data-show-facepile="true">
+                                 <blockquote cite="https://www.facebook.com/diocesisdesantotomectes" class="fb-xfbml-parse-ignore">
+                                     <a href="https://www.facebook.com/diocesisdesantotomectes">Diócesis de Santo Tomé</a>
+                                 </blockquote>
+                             </div>
+                         </div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-6 flex justify-end space-x-4">
-                <button id="cancel-button" class="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300 transition duration-300 btn-animated">Cancelar</button>
-                <button id="save-button" class="px-4 py-2 text-white rounded-md btn-animated btn-gradient-blue">Guardar</button>
+
+            <div id="page-recursos" class="page hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
+                        <h2 class="text-2xl font-bold mb-4 text-slate-700">Acta de la Pastoral</h2>
+                        <p class="text-slate-600 mb-6">Gestiona las actas de las reuniones de la pastoral.</p>
+                        <a href="https://docs.google.com/document/d/15s6Qehevb3M_skfp1ZC-ZCcMNXMWN1YUMvgXCzzAktk/edit?tab=t.0" target="_blank" rel="noopener noreferrer" class="inline-block px-6 py-3 text-white font-semibold rounded-lg btn-animated btn-gradient-blue">
+                            Acta de la Pastoral
+                        </a>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
+                        <h2 class="text-2xl font-bold mb-4 text-slate-700">Estatuto de la Pastoral</h2>
+                        <p class="text-slate-600 mb-6">Consulta el documento oficial que rige el funcionamiento de la pastoral.</p>
+                        <a href="https://docs.google.com/document/d/1UvKDtRVyfuhkiARHa9lU7r0Rd_UpyMT0mv2-2QZ1mco/edit?tab=t.0" target="_blank" rel="noopener noreferrer" class="inline-block px-6 py-3 text-white font-semibold rounded-lg btn-animated btn-gradient-blue">Ver Estatuto</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="event-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+            <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
+                <h3 class="text-xl font-bold mb-4">Editar Información del Día</h3>
+                <p class="mb-4">Fecha: <span id="selected-date" class="font-semibold"></span></p>
+                <div class="space-y-4">
+                    <div>
+                        <label for="encargado-name" class="block text-sm font-medium text-slate-700 mb-1">Encargado del Flyer:</label>
+                        <input type="text" id="encargado-name" class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Nombre del encargado...">
+                    </div>
+                    <div>
+                        <label for="other-info" class="block text-sm font-medium text-slate-700 mb-1">Otra Información:</label>
+                        <textarea id="other-info" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Añadir notas o información adicional..."></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-4">
+                    <button id="cancel-button" class="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300 transition duration-300 btn-animated">Cancelar</button>
+                    <button id="save-button" class="px-4 py-2 text-white rounded-md btn-animated btn-gradient-blue">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // --- VARIABLES GLOBALES ---
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCpYh9NLF_2G_29pHDgQzano9wupSNDzsk",
+            authDomain: "pastoraldelacomunicacion-bceb9.firebaseapp.com",
+            projectId: "pastoraldelacomunicacion-bceb9",
+            storageBucket: "pastoraldelacomunicacion-bceb9.appspot.com",
+            messagingSenderId: "241037203760",
+            appId: "1:241037203760:web:a9fa13d55dcb0e305d90f5"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- AUTHENTICATION LOGIC ---
+        const loginContainer = document.getElementById('login-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email-address');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('login-error');
+        const logoutButton = document.getElementById('logout-button');
+        const logoutButtonMobile = document.getElementById('logout-button-mobile');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                loginContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                initializeAppLogic(); // Initialize the main app logic
+            } else {
+                // User is signed out
+                loginContainer.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+            }
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            loginError.classList.add('hidden');
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in. onAuthStateChanged will handle the UI change.
+                })
+                .catch((error) => {
+                    loginError.textContent = 'Error: Correo o contraseña incorrectos.';
+                    loginError.classList.remove('hidden');
+                });
+        });
+
+        const handleLogout = () => {
+             signOut(auth).catch((error) => {
+                console.error('Logout Error:', error);
+             });
+        };
+
+        logoutButton.addEventListener('click', handleLogout);
+        logoutButtonMobile.addEventListener('click', handleLogout);
+
+        // --- MAIN APPLICATION LOGIC ---
+        function initializeAppLogic() {
+            // Check if the app has already been initialized to avoid re-running code
+            if (window.appInitialized) return;
+
             const monthYearEl = document.getElementById('month-year');
             const calendarEl = document.getElementById('calendar');
             const prevMonthBtn = document.getElementById('prev-month');
@@ -434,7 +544,9 @@
             currentDate = new Date(2025, 8, 1); // Iniciar en Septiembre de 2025
             generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
             handleNavigation(window.location.hash || '#inicio');
-        });
+            
+            window.appInitialized = true; // Set flag to true after initialization
+        }
     </script>
 </body>
 </html>
