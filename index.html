@@ -115,6 +115,7 @@
             <div class="hidden md:flex items-center space-x-6">
                 <a href="#inicio" class="nav-link text-slate-600 hover:text-blue-500 transition duration-300 active">Inicio</a>
                 <a href="#recursos" class="nav-link text-slate-600 hover:text-blue-500 transition duration-300">Recursos</a>
+                <a href="https://www.diocesisdesantotome.com/" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-blue-500 transition duration-300">Página Web</a>
                 <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" class="btn-animated btn-gradient-purple inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-lg shadow-md">
                     Canva
                 </a>
@@ -127,6 +128,7 @@
         <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
             <a href="#inicio" class="nav-link block py-2 text-slate-600 hover:text-blue-500 active">Inicio</a>
             <a href="#recursos" class="nav-link block py-2 text-slate-600 hover:text-blue-500">Recursos</a>
+            <a href="https://www.diocesisdesantotome.com/" target="_blank" rel="noopener noreferrer" class="block py-2 text-slate-600 hover:text-blue-500">Página Web</a>
             <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" class="block py-2 text-purple-600 font-semibold hover:text-purple-700">Canva</a>
         </div>
     </header>
@@ -185,10 +187,23 @@
 
         <!-- Página de Recursos -->
         <div id="page-recursos" class="page hidden">
-            <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
-                <h2 class="text-2xl font-bold mb-4 text-slate-700">Acta de la Pastoral</h2>
-                <!-- Aquí irá el contenido del acta -->
-                <p class="text-slate-500">Próximamente, aquí podrás gestionar el acta de la pastoral.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Módulo de Acta -->
+                <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Acta de la Pastoral</h2>
+                    <p class="text-slate-600 mb-6">Accede al historial de actas de las reuniones de la pastoral.</p>
+                    <a href="https://docs.google.com/document/d/15s6Qehevb3M_skfp1ZC-ZCcMNXMWN1YUMvgXCzzAktk/edit?usp=drive_link" target="_blank" rel="noopener noreferrer" class="inline-block px-6 py-3 text-white font-semibold rounded-lg btn-animated btn-gradient-blue">
+                        Ver Acta Anterior
+                    </a>
+                </div>
+                <!-- Módulo de Estatuto -->
+                <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg border border-slate-200">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Estatuto de la Pastoral</h2>
+                    <p class="text-slate-600 mb-6">Consulta el documento oficial que rige el funcionamiento de la pastoral.</p>
+                    <a href="https://docs.google.com/document/d/1UvKDtRVyfuhkiARHa9lU7r0Rd_UpyMT0mv2-2QZ1mco/edit?tab=t.0" target="_blank" rel="noopener noreferrer" class="inline-block px-6 py-3 text-white font-semibold rounded-lg btn-animated btn-gradient-blue">
+                        Ver Estatuto
+                    </a>
+                </div>
             </div>
         </div>
 
