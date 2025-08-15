@@ -60,10 +60,35 @@
         }
 
         .event-item {
+            position: relative;
             padding: 2px 4px;
+            padding-right: 18px; /* Espacio para el botón de eliminar */
             border-radius: 4px;
             line-height: 1.3;
         }
+        .delete-event-btn {
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: rgba(0,0,0,0.1);
+            color: rgba(0,0,0,0.4);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            line-height: 1;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .event-item:hover .delete-event-btn {
+            opacity: 1;
+        }
+
         .event-holiday { background-color: #dcfce7; color: #166534; }
         .event-jornada { background-color: #e0f2fe; color: #1e40af; }
         .event-encargado { 
@@ -242,7 +267,7 @@
             </div>
         </main>
 
-        <!-- MODAL ACTUALIZADO -->
+        <!-- MODAL -->
         <div id="event-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex justify-center items-start overflow-y-auto p-4 sm:p-6 md:p-10">
             <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-lg transform transition-all duration-300 ease-in-out">
                 <h3 class="text-xl font-bold mb-2">Editar Información del Día</h3>
@@ -368,62 +393,76 @@
             let currentDate = new Date();
             let selectedDateStr = '';
             
-            let sharedEvents = {};
-            const sharedEventsRef = doc(db, "shared-events", "all-events");
+            let allEvents = {};
+            const allEventsRef = doc(db, "calendar-events", "all");
 
-            onSnapshot(sharedEventsRef, (docSnap) => {
-                sharedEvents = docSnap.exists() ? docSnap.data() : {};
+            async function initializeCalendarData() {
+                const initialData = {
+                    '2025-09-01': { jornada: 'Jornada mundial de oración por el cuidado de la creación.' },
+                    '2025-09-03': { holiday: 'Memoria obligatoria de San Gregorio Magno, papa y doctor de la Iglesia.' },
+                    '2025-09-08': { holiday: 'Fiesta de la Natividad de la Bienaventurada Virgen María.', jornada: 'Jornada nacional de la vida consagrada.' },
+                    '2025-09-13': { holiday: 'Memoria obligatoria de San Juan Crisóstomo, obispo y doctor de la Iglesia.' },
+                    '2025-09-14': { holiday: 'Fiesta de la Exaltación de la Santa Cruz.' },
+                    '2025-09-15': { holiday: 'Memoria obligatoria de la Bienaventurada Virgen María de los Dolores.' },
+                    '2025-09-16': { holiday: 'Memoria obligatoria de los Santos Cornelio, papa, y Cipriano, obispo, mártires.' },
+                    '2025-09-20': { holiday: 'Memoria obligatoria de los Santos Andrés Kim Taegon, presbítero, Pablo Chong Hasang y compañeros, mártires.' },
+                    '2025-09-23': { holiday: 'Memoria obligatoria de San Pío de Pietrelcina, presbítero.', jornada: 'Día internacional contra la explotación sexual y trata de personas.' },
+                    '2025-09-24': { holiday: 'Memoria obligatoria de la Bienaventurada Virgen María de la Merced.' },
+                    '2025-09-27': { holiday: 'Memoria obligatoria de San Vicente de Paúl, presbítero.', jornada: 'Jornada mundial del turismo.' },
+                    '2025-09-28': { jornada: 'Domingo bíblico nacional y Jornada mundial del migrante y refugiado.' },
+                    '2025-09-29': { holiday: 'Fiesta de los Santos Arcángeles Miguel, Gabriel y Rafael.' },
+                    '2025-09-30': { holiday: 'Memoria obligatoria de San Jerónimo, presbítero y doctor de la Iglesia.' },
+                    '2025-10-01': { holiday: 'Memoria obligatoria de Santa Teresa del Niño Jesús, virgen y doctora de la Iglesia.' },
+                    '2025-10-02': { holiday: 'Memoria obligatoria de los Santos Ángeles Custodios.' },
+                    '2025-10-04': { holiday: 'Memoria obligatoria de San Francisco de Asís.' },
+                    '2025-10-07': { holiday: 'Memoria obligatoria de la Bienaventurada Virgen María del Rosario.' },
+                    '2025-10-12': { jornada: 'Jornada de las misiones.' },
+                    '2025-10-15': { holiday: 'Memoria obligatoria de Santa Teresa de Jesús, virgen y doctora de la Iglesia.' },
+                    '2025-10-17': { holiday: 'Memoria obligatoria de San Ignacio de Antioquía, obispo y mártir.' },
+                    '2025-10-18': { holiday: 'Fiesta de San Lucas, evangelista.' },
+                    '2025-10-28': { holiday: 'Fiesta de los Santos Simón y Judas, apóstoles.' },
+                    '2025-11-01': { holiday: 'Solemnidad de Todos los Santos.', jornada: 'Jornada nacional de oración por la santificación del pueblo argentino y la glorificación de sus siervos de Dios.' },
+                    '2025-11-04': { holiday: 'Memoria obligatoria de San Carlos Borromeo, obispo.' },
+                    '2025-11-07': { holiday: 'Memoria obligatoria de la Bienaventurada Virgen María, Madre y Medianera de la Gracia.' },
+                    '2025-11-09': { holiday: 'Fiesta de la Dedicación de la Basílica de San Juan de Letrán.' },
+                    '2025-11-10': { holiday: 'Memoria obligatoria de San León Magno, papa y doctor de la Iglesia.' },
+                    '2025-11-11': { holiday: 'Memoria obligatoria de San Martín de Tours, obispo.' },
+                    '2025-11-12': { holiday: 'Memoria obligatoria de San Josafat, obispo y mártir.' },
+                    '2025-11-16': { jornada: 'Jornada mundial de los pobres.' },
+                    '2025-11-17': { holiday: 'Memoria obligatoria de los Santos Roque González, Alfonso Rodríguez y Juan del Castillo, presbíteros y mártires.' },
+                    '2025-11-19': { holiday: 'Memoria obligatoria de Santa Isabel de Hungría.' },
+                    '2025-11-21': { holiday: 'Memoria obligatoria de la Presentación de la Bienaventurada Virgen María.' },
+                    '2025-11-22': { holiday: 'Memoria obligatoria de Santa Cecilia, virgen y mártir.' },
+                    '2025-11-23': { holiday: 'Solemnidad de Nuestro Señor Jesucristo, Rey del Universo.' },
+                    '2025-11-24': { holiday: 'Memoria obligatoria de San Andrés Dung-Lac, presbítero, y compañeros, mártires.' },
+                    '2025-11-27': { jornada: 'Día universal de acción de gracias.' },
+                    '2025-12-03': { holiday: 'Memoria obligatoria de San Francisco Javier, presbítero.' },
+                    '2025-12-08': { holiday: 'Solemnidad de la Inmaculada Concepción de la Bienaventurada Virgen María.' },
+                    '2025-12-12': { holiday: 'Fiesta de la Bienaventurada Virgen María de Guadalupe.' },
+                    '2025-12-13': { holiday: 'Memoria obligatoria de Santa Lucía, virgen y mártir.' },
+                    '2025-12-25': { holiday: 'Solemnidad de la Natividad del Señor.' },
+                    '2025-12-26': { holiday: 'Fiesta de San Esteban, primer mártir.' },
+                    '2025-12-27': { holiday: 'Fiesta de San Juan, apóstol y evangelista.' },
+                    '2025-12-28': { holiday: 'Fiesta de la Sagrada Familia de Jesús, María y José.' }
+                };
+                try {
+                    console.log("Inicializando datos del calendario en Firestore...");
+                    await setDoc(allEventsRef, initialData);
+                    allEvents = initialData; 
+                } catch (error) {
+                    console.error("Error al inicializar los datos del calendario:", error);
+                }
+            }
+
+            onSnapshot(allEventsRef, (docSnap) => {
+                if (docSnap.exists() && Object.keys(docSnap.data()).length > 0) {
+                    allEvents = docSnap.data();
+                } else {
+                    initializeCalendarData();
+                }
                 generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
             });
 
-            const calendarData = {
-                '2025-09-01': { jornada: 'Jornada mundial de oración por el cuidado de la creación.' },
-                '2025-09-03': { holiday: 'Memoria obligatoria de San Gregorio Magno, papa y doctor de la Iglesia.' },
-                '2025-09-08': { holiday: 'Fiesta de la Natividad de la Bienaventurada Virgen María.', jornada: 'Jornada nacional de la vida consagrada.' },
-                '2025-09-13': { holiday: 'Memoria obligatoria de San Juan Crisóstomo, obispo y doctor de la Iglesia.' },
-                '2025-09-14': { holiday: 'Fiesta de la Exaltación de la Santa Cruz.' },
-                '2025-09-15': { holiday: 'Memoria obligatoria de la Bienaventurada Virgen María de los Dolores.' },
-                '2025-09-16': { holiday: 'Memoria obligatoria de los Santos Cornelio, papa, y Cipriano, obispo, mártires.' },
-                '2025-09-20': { holiday: 'Memoria obligatoria de los Santos Andrés Kim Taegon, presbítero, Pablo Chong Hasang y compañeros, mártires.' },
-                '2025-09-23': { holiday: 'Memoria obligatoria de San Pío de Pietrelcina, presbítero.', jornada: 'Día internacional contra la explotación sexual y trata de personas.' },
-                '2025-09-24': { holiday: 'Memoria obligatoria de la Bienaventurada Virgen María de la Merced.' },
-                '2025-09-27': { holiday: 'Memoria obligatoria de San Vicente de Paúl, presbítero.', jornada: 'Jornada mundial del turismo.' },
-                '2025-09-28': { jornada: 'Domingo bíblico nacional y Jornada mundial del migrante y refugiado.' },
-                '2025-09-29': { holiday: 'Fiesta de los Santos Arcángeles Miguel, Gabriel y Rafael.' },
-                '2025-09-30': { holiday: 'Memoria obligatoria de San Jerónimo, presbítero y doctor de la Iglesia.' },
-                '2025-10-01': { holiday: 'Memoria obligatoria de Santa Teresa del Niño Jesús, virgen y doctora de la Iglesia.' },
-                '2025-10-02': { holiday: 'Memoria obligatoria de los Santos Ángeles Custodios.' },
-                '2025-10-04': { holiday: 'Memoria obligatoria de San Francisco de Asís.' },
-                '2025-10-07': { holiday: 'Memoria obligatoria de la Bienaventurada Virgen María del Rosario.' },
-                '2025-10-12': { jornada: 'Jornada de las misiones.' },
-                '2025-10-15': { holiday: 'Memoria obligatoria de Santa Teresa de Jesús, virgen y doctora de la Iglesia.' },
-                '2025-10-17': { holiday: 'Memoria obligatoria de San Ignacio de Antioquía, obispo y mártir.' },
-                '2025-10-18': { holiday: 'Fiesta de San Lucas, evangelista.' },
-                '2025-10-28': { holiday: 'Fiesta de los Santos Simón y Judas, apóstoles.' },
-                '2025-11-01': { holiday: 'Solemnidad de Todos los Santos.', jornada: 'Jornada nacional de oración por la santificación del pueblo argentino y la glorificación de sus siervos de Dios.' },
-                '2025-11-04': { holiday: 'Memoria obligatoria de San Carlos Borromeo, obispo.' },
-                '2025-11-07': { holiday: 'Memoria obligatoria de la Bienaventurada Virgen María, Madre y Medianera de la Gracia.' },
-                '2025-11-09': { holiday: 'Fiesta de la Dedicación de la Basílica de San Juan de Letrán.' },
-                '2025-11-10': { holiday: 'Memoria obligatoria de San León Magno, papa y doctor de la Iglesia.' },
-                '2025-11-11': { holiday: 'Memoria obligatoria de San Martín de Tours, obispo.' },
-                '2025-11-12': { holiday: 'Memoria obligatoria de San Josafat, obispo y mártir.' },
-                '2025-11-16': { jornada: 'Jornada mundial de los pobres.' },
-                '2025-11-17': { holiday: 'Memoria obligatoria de los Santos Roque González, Alfonso Rodríguez y Juan del Castillo, presbíteros y mártires.' },
-                '2025-11-19': { holiday: 'Memoria obligatoria de Santa Isabel de Hungría.' },
-                '2025-11-21': { holiday: 'Memoria obligatoria de la Presentación de la Bienaventurada Virgen María.' },
-                '2025-11-22': { holiday: 'Memoria obligatoria de Santa Cecilia, virgen y mártir.' },
-                '2025-11-23': { holiday: 'Solemnidad de Nuestro Señor Jesucristo, Rey del Universo.' },
-                '2025-11-24': { holiday: 'Memoria obligatoria de San Andrés Dung-Lac, presbítero, y compañeros, mártires.' },
-                '2025-11-27': { jornada: 'Día universal de acción de gracias.' },
-                '2025-12-03': { holiday: 'Memoria obligatoria de San Francisco Javier, presbítero.' },
-                '2025-12-08': { holiday: 'Solemnidad de la Inmaculada Concepción de la Bienaventurada Virgen María.' },
-                '2025-12-12': { holiday: 'Fiesta de la Bienaventurada Virgen María de Guadalupe.' },
-                '2025-12-13': { holiday: 'Memoria obligatoria de Santa Lucía, virgen y mártir.' },
-                '2025-12-25': { holiday: 'Solemnidad de la Natividad del Señor.' },
-                '2025-12-26': { holiday: 'Fiesta de San Esteban, primer mártir.' },
-                '2025-12-27': { holiday: 'Fiesta de San Juan, apóstol y evangelista.' },
-                '2025-12-28': { holiday: 'Fiesta de la Sagrada Familia de Jesús, María y José.' }
-            };
 
             function generateCalendar(year, month) {
                 const calendarBody = calendarEl;
@@ -461,21 +500,58 @@
                         dayCell.classList.add('today');
                     }
                     
-                    const staticData = calendarData[dateStr];
-                    const sharedData = sharedEvents[dateStr];
+                    const dayData = allEvents[dateStr] || {};
 
-                    if (staticData?.holiday) eventsContainer.innerHTML += `<div class="event-item event-holiday">${staticData.holiday}</div>`;
-                    if (staticData?.jornada) eventsContainer.innerHTML += `<div class="event-item event-jornada">${staticData.jornada}</div>`;
-                    if (sharedData?.encargado) {
-                        const statusClass = sharedData.status === 'completado' ? 'status-completado' : '';
-                        eventsContainer.innerHTML += `<div class="event-item event-encargado ${statusClass}">Flyer: ${sharedData.encargado}</div>`;
-                    }
-                    if (sharedData?.otroDato) eventsContainer.innerHTML += `<div class="event-item event-otro-dato">Dato: ${sharedData.otroDato}</div>`;
+                    const eventOrder = ['holiday', 'jornada', 'encargado', 'otroDato'];
+                    eventOrder.forEach(key => {
+                        if (dayData[key]) {
+                            let eventHTML = '';
+                            const statusClass = (key === 'encargado' && dayData.status === 'completado') ? 'status-completado' : '';
+                            const prefix = key === 'encargado' ? 'Flyer: ' : (key === 'otroDato' ? 'Dato: ' : '');
+                            eventHTML = `
+                                <div class="event-item event-${key} ${statusClass}">
+                                    ${prefix}${dayData[key]}
+                                    <button class="delete-event-btn" data-date="${dateStr}" data-key="${key}">×</button>
+                                </div>`;
+                            eventsContainer.innerHTML += eventHTML;
+                        }
+                    });
 
-                    dayCell.addEventListener('click', () => openModal(dateStr));
+                    dayCell.addEventListener('click', (e) => {
+                        if (e.target.closest('.delete-event-btn')) {
+                            handleDeleteEvent(e.target.closest('.delete-event-btn'));
+                        } else {
+                            openModal(dateStr);
+                        }
+                    });
                     calendarBody.appendChild(dayCell);
                 }
             }
+            
+            async function handleDeleteEvent(button) {
+                const date = button.dataset.date;
+                const keyToDelete = button.dataset.key;
+
+                if (!date || !keyToDelete) return;
+
+                const updatedEvents = { ...allEvents };
+                if (updatedEvents[date]) {
+                    delete updatedEvents[date][keyToDelete];
+                    if (keyToDelete === 'encargado') {
+                        delete updatedEvents[date]['status'];
+                    }
+                    if (Object.keys(updatedEvents[date]).length === 0) {
+                        delete updatedEvents[date];
+                    }
+                }
+
+                try {
+                    await setDoc(allEventsRef, updatedEvents);
+                } catch (err) {
+                    console.error("Error al eliminar el evento:", err);
+                }
+            }
+
 
             function updateStatusUI(status) {
                 statusDisplay.dataset.status = status;
@@ -490,7 +566,7 @@
                         statusDisplay.className = 'flex-grow text-center px-4 py-2 font-semibold rounded-md transition-colors duration-200 bg-yellow-100 text-yellow-800';
                         toggleStatusButton.classList.remove('hidden');
                         break;
-                    default: // 'ninguno'
+                    default:
                         statusDisplay.textContent = 'Ninguno';
                         statusDisplay.className = 'flex-grow text-center px-4 py-2 font-semibold rounded-md transition-colors duration-200 bg-slate-100 text-slate-500';
                         toggleStatusButton.classList.add('hidden');
@@ -503,23 +579,22 @@
                 const dateObj = new Date(dateStr + 'T00:00:00');
                 selectedDateEl.textContent = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 
-                const staticData = calendarData[dateStr] || {};
-                const sharedData = sharedEvents[dateStr] || {};
+                const dayData = allEvents[dateStr] || {};
                 
-                encargadoNameInput.value = sharedData.encargado || '';
-                otroDatoInput.value = sharedData.otroDato || '';
+                encargadoNameInput.value = dayData.encargado || '';
+                otroDatoInput.value = dayData.otroDato || '';
                 
-                if (sharedData.encargado) {
-                    updateStatusUI(sharedData.status || 'pendiente');
+                if (dayData.encargado) {
+                    updateStatusUI(dayData.status || 'pendiente');
                 } else {
                     updateStatusUI('ninguno');
                 }
                 
                 modalDetailsContainer.innerHTML = '';
                 let detailsHtml = '';
-                if (staticData.holiday) detailsHtml += `<p><b>Santoral/Fiesta:</b> ${staticData.holiday}</p>`;
-                if (staticData.jornada) detailsHtml += `<p class="mt-1"><b>Jornada:</b> ${staticData.jornada}</p>`;
-                if (sharedData.encargado) detailsHtml += `<p class="mt-1"><b>Encargado Asignado:</b> ${sharedData.encargado}</p>`;
+                if (dayData.holiday) detailsHtml += `<p><b>Santoral/Fiesta:</b> ${dayData.holiday}</p>`;
+                if (dayData.jornada) detailsHtml += `<p class="mt-1"><b>Jornada:</b> ${dayData.jornada}</p>`;
+                if (dayData.encargado) detailsHtml += `<p class="mt-1"><b>Encargado Asignado:</b> ${dayData.encargado}</p>`;
                 
                 modalDetailsContainer.innerHTML = detailsHtml || '<p class="text-slate-500">No hay información para este día.</p>';
                 
@@ -567,24 +642,31 @@
                 const otroDato = otroDatoInput.value.trim();
                 let status = statusDisplay.dataset.status;
                 
-                const currentData = { ...sharedEvents };
+                const updatedEvents = { ...allEvents };
+                if (!updatedEvents[selectedDateStr]) {
+                    updatedEvents[selectedDateStr] = {};
+                }
 
-                if (encargadoName || otroDato) {
-                    // Si no hay encargado, no tiene sentido guardar un estado
-                    if (!encargadoName) {
-                        status = 'ninguno';
-                    }
-                    currentData[selectedDateStr] = { 
-                        encargado: encargadoName, 
-                        status: status,
-                        otroDato: otroDato
-                    };
+                if (encargadoName) {
+                    updatedEvents[selectedDateStr].encargado = encargadoName;
+                    updatedEvents[selectedDateStr].status = status;
                 } else {
-                    delete currentData[selectedDateStr];
+                    delete updatedEvents[selectedDateStr].encargado;
+                    delete updatedEvents[selectedDateStr].status;
+                }
+
+                if (otroDato) {
+                    updatedEvents[selectedDateStr].otroDato = otroDato;
+                } else {
+                    delete updatedEvents[selectedDateStr].otroDato;
+                }
+                
+                if (Object.keys(updatedEvents[selectedDateStr]).length === 0) {
+                    delete updatedEvents[selectedDateStr];
                 }
                 
                 try {
-                    await setDoc(sharedEventsRef, currentData);
+                    await setDoc(allEventsRef, updatedEvents);
                     closeModal();
                 } catch (e) {
                     console.error("Error al guardar en Firestore: ", e);
