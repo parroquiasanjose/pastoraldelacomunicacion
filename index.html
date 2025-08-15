@@ -261,11 +261,12 @@
 
     <!-- Firebase SDKs -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
+        // Importar funciones de Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCpYh9NLF_2G_29pHDgQzano9wupSNDzsk",
             authDomain: "pastoraldelacomunicacion-bceb9.firebaseapp.com",
@@ -275,11 +276,12 @@
             appId: "1:241037203760:web:a9fa13d55dcb0e305d90f5"
         };
 
-        // Initialize Firebase
+        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app); // Inicializar Firestore
 
-        // --- AUTHENTICATION LOGIC ---
+        // --- LÓGICA DE AUTENTICACIÓN ---
         const loginContainer = document.getElementById('login-container');
         const appContainer = document.getElementById('app-container');
         const loginForm = document.getElementById('login-form');
@@ -291,12 +293,12 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in
+                // Usuario autenticado
                 loginContainer.classList.add('hidden');
                 appContainer.classList.remove('hidden');
-                initializeAppLogic(); // Initialize the main app logic
+                initializeAppLogic(); // Iniciar la lógica principal de la app
             } else {
-                // User is signed out
+                // Usuario no autenticado
                 loginContainer.classList.remove('hidden');
                 appContainer.classList.add('hidden');
             }
@@ -309,9 +311,6 @@
             loginError.classList.add('hidden');
 
             signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Signed in. onAuthStateChanged will handle the UI change.
-                })
                 .catch((error) => {
                     loginError.textContent = 'Error: Correo o contraseña incorrectos.';
                     loginError.classList.remove('hidden');
@@ -319,17 +318,16 @@
         });
 
         const handleLogout = () => {
-             signOut(auth).catch((error) => {
-                console.error('Logout Error:', error);
-             });
+            signOut(auth).catch((error) => {
+                console.error('Error al cerrar sesión:', error);
+            });
         };
 
         logoutButton.addEventListener('click', handleLogout);
         logoutButtonMobile.addEventListener('click', handleLogout);
 
-        // --- MAIN APPLICATION LOGIC ---
+        // --- LÓGICA PRINCIPAL DE LA APLICACIÓN ---
         function initializeAppLogic() {
-            // Check if the app has already been initialized to avoid re-running code
             if (window.appInitialized) return;
 
             const monthYearEl = document.getElementById('month-year');
@@ -350,7 +348,23 @@
             let currentDate = new Date();
             let selectedDateStr = '';
             
-            let userEvents = JSON.parse(localStorage.getItem('flyerEvents')) || {};
+            // Variable para almacenar los eventos, se sincronizará con Firestore
+            let sharedEvents = {};
+
+            // Referencia al documento COMPARTIDO en Firestore
+            const sharedEventsRef = doc(db, "shared-events", "all-events");
+
+            // Escuchar cambios en tiempo real en el documento de Firestore
+            onSnapshot(sharedEventsRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    sharedEvents = docSnap.data();
+                } else {
+                    console.log("No hay datos de eventos compartidos, se creará uno nuevo al guardar.");
+                    sharedEvents = {};
+                }
+                // Volver a generar el calendario con los datos actualizados
+                generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+            });
 
             const calendarData = {
                 '2025-09-01': { jornada: 'Jornada mundial de oración por el cuidado de la creación.' },
@@ -401,10 +415,6 @@
                 '2025-12-28': { holiday: 'Fiesta de la Sagrada Familia de Jesús, María y José.' }
             };
 
-            function saveUserEvents() {
-                localStorage.setItem('flyerEvents', JSON.stringify(userEvents));
-            }
-
             function generateCalendar(year, month) {
                 const calendarBody = calendarEl;
                 Array.from(calendarBody.children).forEach(child => {
@@ -445,7 +455,7 @@
                     }
                     
                     const staticData = calendarData[dateStr];
-                    const userData = userEvents[dateStr];
+                    const sharedData = sharedEvents[dateStr];
 
                     if (staticData?.holiday) {
                         const item = document.createElement('div');
@@ -459,16 +469,16 @@
                         item.textContent = staticData.jornada;
                         eventsContainer.appendChild(item);
                     }
-                    if (userData?.encargado) {
+                    if (sharedData?.encargado) {
                         const item = document.createElement('div');
                         item.classList.add('event-item', 'event-encargado');
-                        item.textContent = `Flyer: ${userData.encargado}`;
+                        item.textContent = `Flyer: ${sharedData.encargado}`;
                         eventsContainer.appendChild(item);
                     }
-                     if (userData?.info) {
+                     if (sharedData?.info) {
                         const item = document.createElement('div');
                         item.classList.add('event-item', 'event-info');
-                        item.textContent = userData.info;
+                        item.textContent = sharedData.info;
                         eventsContainer.appendChild(item);
                     }
 
@@ -484,9 +494,9 @@
                     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                 });
                 
-                const userData = userEvents[dateStr] || {};
-                encargadoNameInput.value = userData.encargado || '';
-                otherInfoInput.value = userData.info || '';
+                const data = sharedEvents[dateStr] || {};
+                encargadoNameInput.value = data.encargado || '';
+                otherInfoInput.value = data.info || '';
                 
                 eventModal.classList.remove('hidden');
                 encargadoNameInput.focus();
@@ -524,17 +534,26 @@
                 generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
             });
 
-            saveButton.addEventListener('click', () => {
+            saveButton.addEventListener('click', async () => {
                 const encargadoName = encargadoNameInput.value.trim();
                 const otherInfo = otherInfoInput.value.trim();
+                
+                const currentData = { ...sharedEvents };
+
                 if (encargadoName || otherInfo) {
-                    userEvents[selectedDateStr] = { encargado: encargadoName, info: otherInfo };
+                    currentData[selectedDateStr] = { encargado: encargadoName, info: otherInfo };
                 } else {
-                    delete userEvents[selectedDateStr];
+                    delete currentData[selectedDateStr];
                 }
-                saveUserEvents();
-                generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
-                closeModal();
+                
+                // Guardar el objeto completo en Firestore
+                try {
+                    await setDoc(sharedEventsRef, currentData);
+                    closeModal();
+                } catch (e) {
+                    console.error("Error al guardar en Firestore: ", e);
+                    alert("No se pudo guardar la información. Inténtalo de nuevo.");
+                }
             });
 
             cancelButton.addEventListener('click', closeModal);
@@ -552,10 +571,10 @@
 
             // --- INICIALIZACIÓN ---
             currentDate = new Date(2025, 8, 1); // Iniciar en Septiembre de 2025
-            generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+            // El calendario se genera por primera vez gracias al onSnapshot
             handleNavigation(window.location.hash || '#inicio');
             
-            window.appInitialized = true; // Set flag to true after initialization
+            window.appInitialized = true; // Marcar como inicializado
         }
     </script>
 </body>
