@@ -11,7 +11,7 @@
             font-family: 'Inter', sans-serif;
         }
         #calendar {
-            grid-auto-rows: minmax(120px, auto);
+            grid-auto-rows: minmax(160px, auto); /* Aumentamos la altura mínima de las celdas */
         }
         /* Estilo para el día actual en el calendario */
         .today .day-number {
@@ -23,7 +23,11 @@
         .day-cell {
             display: flex;
             flex-direction: column;
-            border: 1px solid #f3f4f6; /* gray-100 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            background-color: #f9fafb; /* gray-50 */
+        }
+        .day-cell.is-month {
+             background-color: white;
         }
 
         .day-number {
@@ -39,63 +43,24 @@
 
         .events-container {
             flex-grow: 1;
-            padding: 2px;
+            padding: 4px;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
             gap: 4px;
-            overflow: hidden;
-        }
-
-        .event-badge {
-            width: 100%;
-            padding: 2px 6px;
-            border-radius: 4px;
+            overflow-y: auto; /* Permitir scroll si hay mucho contenido */
             font-size: 0.75rem; /* 12px */
-            font-weight: 500;
-            text-align: left;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        .badge-holiday { background-color: #dcfce7; color: #15803d; } /* green-100 / green-800 */
-        .badge-jornada { background-color: #e0f2fe; color: #1d4ed8; } /* sky-100 / blue-700 */
-        .badge-event { background-color: #fef9c3; color: #b45309; } /* yellow-100 / amber-700 */
-
-
-        /* --- Estilos para Tooltip --- */
-        .event-tooltip {
-            visibility: hidden;
-            width: 280px;
-            background-color: #1f2937; /* gray-800 */
-            color: #fff;
-            text-align: left;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 50;
-            bottom: 105%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
+        /* Estilos para cada tipo de evento dentro de la celda */
+        .event-item {
+            padding: 2px 4px;
+            border-radius: 4px;
+            line-height: 1.3;
         }
-        .event-tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #1f2937 transparent transparent transparent;
-        }
-        .has-event:hover .event-tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
+        .event-holiday { background-color: #dcfce7; color: #166534; } /* green-100 / green-800 */
+        .event-jornada { background-color: #e0f2fe; color: #1e40af; } /* sky-100 / blue-800 */
+        .event-encargado { background-color: #fef9c3; color: #854d0e; border-left: 3px solid #ca8a04; } /* yellow-100/amber-800, yellow-600 border */
+        .event-info { background-color: #f3f4f6; color: #4b5563; margin-top: 2px; font-style: italic; } /* gray-100 / gray-600 */
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -141,7 +106,7 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </button>
                 </div>
-                <div id="calendar" class="grid grid-cols-7 gap-1">
+                <div id="calendar" class="grid grid-cols-7">
                     <!-- Días de la semana -->
                     <div class="text-center font-semibold text-gray-500 py-2">Dom</div>
                     <div class="text-center font-semibold text-gray-500 py-2">Lun</div>
@@ -154,12 +119,13 @@
                 </div>
             </div>
 
-            <!-- Columna de Noticias AICA -->
-            <div class="bg-white p-6 rounded-lg shadow-lg flex flex-col">
-                 <h3 class="text-2xl font-bold mb-4 text-gray-700">Noticias de AICA</h3>
-                 <div id="news-feed" class="flex-grow overflow-y-auto space-y-4" style="max-height: 500px;">
-                    <!-- Las noticias se cargarán aquí -->
-                    <p id="news-loading" class="text-gray-500">Cargando noticias...</p>
+            <!-- Columna de AICA Online -->
+            <div class="bg-white rounded-lg shadow-lg flex flex-col">
+                 <div class="p-6 border-b">
+                    <h3 class="text-2xl font-bold text-gray-700">AICA Online</h3>
+                 </div>
+                 <div class="flex-grow">
+                    <iframe src="https://www.aica.org/" class="w-full h-full border-0" style="min-height: 600px;"></iframe>
                  </div>
             </div>
         </div>
@@ -168,11 +134,17 @@
     <!-- Modal para agregar encargado -->
     <div id="event-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Agregar Encargado de Flyer</h3>
-            <p class="mb-4">Fecha seleccionada: <span id="selected-date" class="font-semibold"></span></p>
-            <div>
-                <label for="encargado-name" class="block text-sm font-medium text-gray-700 mb-2">Nombre del Encargado:</label>
-                <input type="text" id="encargado-name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: Juan Pérez">
+            <h3 class="text-xl font-bold mb-4">Editar Información del Día</h3>
+            <p class="mb-4">Fecha: <span id="selected-date" class="font-semibold"></span></p>
+            <div class="space-y-4">
+                <div>
+                    <label for="encargado-name" class="block text-sm font-medium text-gray-700 mb-1">Encargado del Flyer:</label>
+                    <input type="text" id="encargado-name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Nombre del encargado...">
+                </div>
+                <div>
+                    <label for="other-info" class="block text-sm font-medium text-gray-700 mb-1">Otra Información:</label>
+                    <textarea id="other-info" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Añadir notas o información adicional..."></textarea>
+                </div>
             </div>
             <div class="mt-6 flex justify-end space-x-4">
                 <button id="cancel-button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300">Cancelar</button>
@@ -195,14 +167,15 @@
             const eventModal = document.getElementById('event-modal');
             const selectedDateEl = document.getElementById('selected-date');
             const encargadoNameInput = document.getElementById('encargado-name');
+            const otherInfoInput = document.getElementById('other-info');
             const saveButton = document.getElementById('save-button');
             const cancelButton = document.getElementById('cancel-button');
 
             let currentDate = new Date();
             let selectedDateStr = '';
             
-            // Almacenamiento de encargados (la clave es 'YYYY-MM-DD')
-            let events = JSON.parse(localStorage.getItem('flyerEvents')) || {};
+            // Almacenamiento de datos del usuario. La estructura es: { "YYYY-MM-DD": { encargado: "...", info: "..." } }
+            let userEvents = JSON.parse(localStorage.getItem('flyerEvents')) || {};
             
             // Datos fijos del calendario
             const calendarData = {
@@ -260,8 +233,8 @@
 
             // --- FUNCIONES ---
 
-            function saveEvents() {
-                localStorage.setItem('flyerEvents', JSON.stringify(events));
+            function saveUserEvents() {
+                localStorage.setItem('flyerEvents', JSON.stringify(userEvents));
             }
 
             function generateCalendar(year, month) {
@@ -281,12 +254,12 @@
                 }).replace(/^\w/, c => c.toUpperCase());
 
                 for (let i = 0; i < startDayOfWeek; i++) {
-                    calendarBody.appendChild(document.createElement('div'));
+                    calendarBody.appendChild(document.createElement('div')).classList.add('day-cell');
                 }
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayCell = document.createElement('div');
-                    dayCell.classList.add('day-cell', 'relative', 'cursor-pointer', 'transition', 'duration-200', 'hover:bg-gray-50');
+                    dayCell.classList.add('day-cell', 'is-month', 'cursor-pointer', 'transition', 'duration-200', 'hover:shadow-md');
                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     dayCell.dataset.date = dateStr;
 
@@ -305,40 +278,31 @@
                     }
                     
                     const staticData = calendarData[dateStr];
-                    const encargadoInfo = events[dateStr];
+                    const userData = userEvents[dateStr];
 
-                    if (staticData || encargadoInfo) {
-                        dayCell.classList.add('has-event');
-                        const tooltip = document.createElement('div');
-                        tooltip.classList.add('event-tooltip');
-                        let tooltipContent = '';
-
-                        if (staticData?.holiday) {
-                            const badge = document.createElement('div');
-                            badge.classList.add('event-badge', 'badge-holiday');
-                            badge.textContent = 'Festividad';
-                            eventsContainer.appendChild(badge);
-                            tooltipContent += `<div class="p-2"><strong class="text-green-400">Festividad:</strong><br>${staticData.holiday}</div>`;
-                        }
-                        if (staticData?.jornada) {
-                            const badge = document.createElement('div');
-                            badge.classList.add('event-badge', 'badge-jornada');
-                            badge.textContent = 'Jornada';
-                            eventsContainer.appendChild(badge);
-                            if (tooltipContent) tooltipContent += '<hr class="my-1 border-gray-600">';
-                            tooltipContent += `<div class="p-2"><strong class="text-sky-400">Jornada:</strong><br>${staticData.jornada}</div>`;
-                        }
-                        if (encargadoInfo) {
-                            const badge = document.createElement('div');
-                            badge.classList.add('event-badge', 'badge-event');
-                            badge.textContent = `Encargado`;
-                            eventsContainer.appendChild(badge);
-                            if (tooltipContent) tooltipContent += '<hr class="my-1 border-gray-600">';
-                            tooltipContent += `<div class="p-2"><strong class="text-amber-400">Encargado Flyer:</strong><br>${encargadoInfo}</div>`;
-                        }
-                        
-                        tooltip.innerHTML = tooltipContent;
-                        dayCell.appendChild(tooltip);
+                    if (staticData?.holiday) {
+                        const item = document.createElement('div');
+                        item.classList.add('event-item', 'event-holiday');
+                        item.textContent = staticData.holiday;
+                        eventsContainer.appendChild(item);
+                    }
+                    if (staticData?.jornada) {
+                        const item = document.createElement('div');
+                        item.classList.add('event-item', 'event-jornada');
+                        item.textContent = staticData.jornada;
+                        eventsContainer.appendChild(item);
+                    }
+                    if (userData?.encargado) {
+                        const item = document.createElement('div');
+                        item.classList.add('event-item', 'event-encargado');
+                        item.textContent = `Flyer: ${userData.encargado}`;
+                        eventsContainer.appendChild(item);
+                    }
+                     if (userData?.info) {
+                        const item = document.createElement('div');
+                        item.classList.add('event-item', 'event-info');
+                        item.textContent = userData.info;
+                        eventsContainer.appendChild(item);
                     }
 
                     dayCell.addEventListener('click', () => openModal(dateStr));
@@ -352,7 +316,11 @@
                 selectedDateEl.textContent = dateObj.toLocaleDateString('es-ES', {
                     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                 });
-                encargadoNameInput.value = events[dateStr] || '';
+                
+                const userData = userEvents[dateStr] || {};
+                encargadoNameInput.value = userData.encargado || '';
+                otherInfoInput.value = userData.info || '';
+                
                 eventModal.classList.remove('hidden');
                 encargadoNameInput.focus();
             }
@@ -361,76 +329,6 @@
                 eventModal.classList.add('hidden');
             }
             
-            // --- FUNCIÓN PARA CARGAR NOTICIAS DE AICA ---
-            async function fetchAicaNews() {
-                const newsFeedEl = document.getElementById('news-feed');
-                const loadingEl = document.getElementById('news-loading');
-                const rssUrl = 'https://www.aica.org/rss';
-                // Usar un proxy CORS para obtener el feed RSS directamente
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-
-                try {
-                    const response = await fetch(proxyUrl);
-                    if (!response.ok) {
-                        throw new Error('La respuesta de la red no fue exitosa.');
-                    }
-                    const data = await response.json();
-                    const rssContent = data.contents;
-
-                    // Parsear el XML del RSS
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(rssContent, "application/xml");
-                    
-                    const errorNode = xmlDoc.querySelector("parsererror");
-                    if (errorNode) {
-                        throw new Error("Error al parsear el feed RSS.");
-                    }
-
-                    const items = xmlDoc.querySelectorAll("item");
-
-                    if (items.length > 0) {
-                        loadingEl.remove(); // Quitar el mensaje de "cargando"
-                        
-                        items.forEach((item, index) => {
-                            if (index >= 10) return; // Limitar a 10 noticias
-
-                            const title = item.querySelector("title").textContent;
-                            const link = item.querySelector("link").textContent;
-                            const pubDateStr = item.querySelector("pubDate").textContent;
-
-                            const article = document.createElement('a');
-                            article.href = link;
-                            article.target = '_blank';
-                            article.rel = 'noopener noreferrer';
-                            article.className = 'block p-3 rounded-lg hover:bg-gray-100 transition duration-200';
-
-                            const titleEl = document.createElement('h4');
-                            titleEl.className = 'font-semibold text-blue-700 mb-1';
-                            titleEl.textContent = title;
-
-                            const pubDate = new Date(pubDateStr);
-                            const dateString = pubDate.toLocaleDateString('es-ES', {
-                                day: 'numeric', month: 'long', year: 'numeric'
-                            });
-                            const dateEl = document.createElement('p');
-                            dateEl.className = 'text-sm text-gray-500';
-                            dateEl.textContent = dateString;
-                            
-                            article.appendChild(titleEl);
-                            article.appendChild(dateEl);
-                            newsFeedEl.appendChild(article);
-                        });
-
-                    } else {
-                        throw new Error('No se encontraron noticias en el feed.');
-                    }
-                } catch (error) {
-                    console.error('Error al cargar las noticias:', error);
-                    loadingEl.textContent = 'No se pudieron cargar las noticias.';
-                    loadingEl.classList.add('text-red-500');
-                }
-            }
-
             // --- EVENT LISTENERS ---
             prevMonthBtn.addEventListener('click', () => {
                 currentDate.setMonth(currentDate.getMonth() - 1);
@@ -444,12 +342,19 @@
 
             saveButton.addEventListener('click', () => {
                 const encargadoName = encargadoNameInput.value.trim();
-                if (encargadoName) {
-                    events[selectedDateStr] = encargadoName;
+                const otherInfo = otherInfoInput.value.trim();
+
+                if (encargadoName || otherInfo) {
+                    userEvents[selectedDateStr] = {
+                        encargado: encargadoName,
+                        info: otherInfo
+                    };
                 } else {
-                    delete events[selectedDateStr];
+                    // Si ambos campos están vacíos, elimina la entrada
+                    delete userEvents[selectedDateStr];
                 }
-                saveEvents();
+                
+                saveUserEvents();
                 generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
                 closeModal();
             });
@@ -469,7 +374,6 @@
             // --- INICIALIZACIÓN ---
             currentDate = new Date(2025, 8, 1); // Iniciar en Septiembre de 2025
             generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
-            fetchAicaNews(); // Cargar las noticias al iniciar
         });
     </script>
 </body>
