@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="https://i.postimg.cc/BQjqLTLV/Encabezado-para-Paginas-1080-x-1080-px.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Arial&display=swap" rel="stylesheet">
+    <link href="https://fonts.com/css2?family=Georgia&family=Arial&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -28,11 +28,11 @@
             display: flex;
             flex-direction: column;
             border: 1px solid #e5e7eb;
-            background-color: #f8fafc;
+            background-color: #f5f7fa; /* Fondo ligeramente menos claro */
             transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
         }
         .day-cell.is-month {
-             background-color: white;
+            background-color: #fcfcfd; /* Fondo del mes actual un poco más suave */
         }
         .day-cell:hover {
             transform: translateY(-2px);
@@ -62,45 +62,60 @@
 
         .event-item {
             position: relative;
-            padding: 2px 4px;
-            padding-right: 18px; /* Espacio para el botón de eliminar */
-            border-radius: 4px;
+            padding: 4px 6px;
+            padding-right: 24px; /* Espacio para el botón de eliminar */
+            border-radius: 6px;
             line-height: 1.3;
+            font-weight: 500;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .event-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
         .delete-event-btn {
             position: absolute;
             top: 1px;
             right: 1px;
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background-color: rgba(0,0,0,0.1);
-            color: rgba(0,0,0,0.4);
+            color: rgba(0,0,0,0.6);
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 14px;
             line-height: 1;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, background-color 0.2s;
         }
         .event-item:hover .delete-event-btn {
             opacity: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        .delete-event-btn:hover {
+            background-color: rgba(255, 255, 255, 0.8);
         }
 
-        .event-holiday { background-color: #dcfce7; color: #166534; }
-        .event-jornada { background-color: #e0f2fe; color: #1e40af; }
+        /* Colores llamativos para las etiquetas */
+        .event-holiday { background-color: #fecaca; color: #b91c1c; } /* Rojo Vibrante */
+        .event-jornada { background-color: #bfdbfe; color: #1e40af; } /* Azul Fuerte */
         .event-encargado { 
-            background-color: #fef9c3; 
-            color: #854d0e; 
-            border-left: 4px solid #facc15; /* Amarillo para pendiente */
+            background-color: #fbcfe8; 
+            color: #be185d; 
+            border-left: 4px solid #e879f9; /* Magenta para pendiente */
         }
         .event-encargado.status-completado {
             border-left-color: #4ade80; /* Verde para completado */
         }
-        .event-otro-dato { background-color: #f3e8ff; color: #6b21a8; }
+        .event-otro-dato { 
+            background-color: #dcfce7; /* Verde claro */
+            color: #166534; /* Verde oscuro */
+            border-left: 4px solid #10b981; /* Verde más fuerte */
+        }
         
         .nav-link.active {
             color: #2563eb;
@@ -234,22 +249,22 @@
                         </div>
                     </div>
                     <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg flex flex-col border border-slate-200">
-                         <h3 class="text-2xl font-bold mb-4 text-slate-700">Seguinos en Facebook</h3>
-                         <div class="flex-grow">
-                             <div class="fb-page" 
-                                 data-href="https://www.facebook.com/diocesisdesantotomectes" 
-                                 data-tabs="timeline" 
-                                 data-width="" 
-                                 data-height="600" 
-                                 data-small-header="false" 
-                                 data-adapt-container-width="true" 
-                                 data-hide-cover="false" 
-                                 data-show-facepile="true">
-                                 <blockquote cite="https://www.facebook.com/diocesisdesantotomectes" class="fb-xfbml-parse-ignore">
-                                     <a href="https://www.facebook.com/diocesisdesantotomectes">Diócesis de Santo Tomé</a>
-                                 </blockquote>
-                             </div>
-                         </div>
+                        <h3 class="text-2xl font-bold mb-4 text-slate-700">Seguinos en Facebook</h3>
+                        <div class="flex-grow">
+                            <div class="fb-page" 
+                                data-href="https://www.facebook.com/diocesisdesantotomectes" 
+                                data-tabs="timeline" 
+                                data-width="" 
+                                data-height="600" 
+                                data-small-header="false" 
+                                data-adapt-container-width="true" 
+                                data-hide-cover="false" 
+                                data-show-facepile="true">
+                                <blockquote cite="https://www.facebook.com/diocesisdesantotomectes" class="fb-xfbml-parse-ignore">
+                                    <a href="https://www.facebook.com/diocesisdesantotomectes">Diócesis de Santo Tomé</a>
+                                </blockquote>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -323,6 +338,7 @@
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
+        // Configuración de Firebase - No la modifiques
         const firebaseConfig = {
             apiKey: "AIzaSyCpYh9NLF_2G_29pHDgQzano9wupSNDzsk",
             authDomain: "pastoraldelacomunicacion-bceb9.firebaseapp.com",
@@ -453,12 +469,13 @@
                 try {
                     console.log("Inicializando datos del calendario en Firestore...");
                     await setDoc(allEventsRef, initialData);
-                    allEvents = initialData; 
+                    allEvents = initialData;
                 } catch (error) {
                     console.error("Error al inicializar los datos del calendario:", error);
                 }
             }
 
+            // Escuchando los cambios en Firestore en tiempo real
             onSnapshot(allEventsRef, (docSnap) => {
                 if (docSnap.exists() && Object.keys(docSnap.data()).length > 0) {
                     allEvents = docSnap.data();
@@ -563,12 +580,14 @@
                 switch (status) {
                     case 'completado':
                         statusDisplay.textContent = 'Completado';
-                        statusDisplay.className = 'flex-grow text-center px-4 py-2 font-semibold rounded-md transition-colors duration-200 bg-green-100 text-green-800';
+                        // Colores actualizados para el estado "Completado"
+                        statusDisplay.className = 'flex-grow text-center px-4 py-2 font-semibold rounded-md transition-colors duration-200 bg-emerald-200 text-emerald-800';
                         toggleStatusButton.classList.remove('hidden');
                         break;
                     case 'pendiente':
                         statusDisplay.textContent = 'Pendiente';
-                        statusDisplay.className = 'flex-grow text-center px-4 py-2 font-semibold rounded-md transition-colors duration-200 bg-yellow-100 text-yellow-800';
+                        // Colores actualizados para el estado "Pendiente"
+                        statusDisplay.className = 'flex-grow text-center px-4 py-2 font-semibold rounded-md transition-colors duration-200 bg-amber-200 text-amber-800';
                         toggleStatusButton.classList.remove('hidden');
                         break;
                     default:
